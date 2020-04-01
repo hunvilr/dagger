@@ -29,6 +29,7 @@ class AuthActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var stringValue: String
 
+//  https://stackoverflow.com/questions/44381791/lateinit-modifier-is-not-allowed-on-primitive-type-properties-in-kotlin
 //  Error: lateinit modifier is not allowed on primitive type properties in Kotlin
 //    @Inject
 //    lateinit var isAppNotNull:Boolean
@@ -46,7 +47,7 @@ class AuthActivity : DaggerAppCompatActivity() {
 //    @JvmField // expose a field
 //    @field:[Inject Named("isAppNotNull")] // leave your annotatios unchanged
 
-    //https://medium.com/@WindRider/correct-usage-of-dagger-2-named-annotation-in-kotlin-8ab17ced6928
+//    https://medium.com/@WindRider/correct-usage-of-dagger-2-named-annotation-in-kotlin-8ab17ced6928
 //    TL;DR: In Kotlin we inject named fields like this:
 //    @field:[Inject Named("api1")] internal lateinit var api: Api
 //    // or if you inject a primitive
@@ -59,6 +60,7 @@ class AuthActivity : DaggerAppCompatActivity() {
 //    @Inject @Named("api1")
 //    Api api;
 //}
+
     @set:[Inject Named("isAppNotNull")]
     var isAppNotNull: Boolean = false // set a default value
 
