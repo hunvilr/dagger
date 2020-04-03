@@ -1,14 +1,14 @@
-package com.example.daggerpractice4
+package com.example.daggerpractice4.ui
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import com.bumptech.glide.RequestManager
+import com.example.daggerpractice4.R
 import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.properties.Delegates
 
 /**
  *
