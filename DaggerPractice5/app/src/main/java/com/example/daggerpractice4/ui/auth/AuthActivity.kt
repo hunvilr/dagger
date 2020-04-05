@@ -1,9 +1,12 @@
-package com.example.daggerpractice4.ui
+package com.example.daggerpractice4.ui.auth
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
-import android.widget.ImageView
+import android.view.View
+import android.widget.*
+import androidx.lifecycle.Observer
 import com.bumptech.glide.RequestManager
 import com.example.daggerpractice4.R
 import dagger.android.support.DaggerAppCompatActivity
@@ -24,8 +27,7 @@ import javax.inject.Named
  * 2)
  *  kotlin.jvm.KotlinReflectionNotSupportedError: Kotlin reflection implementation is not found at runtime. Make sure you have kotlin-reflect.jar in the classpath
  */
-class AuthActivity : DaggerAppCompatActivity() {
-
+class AuthActivity : DaggerAppCompatActivity(), View.OnClickListener {
     @Inject
     lateinit var stringValue: String
 
@@ -76,6 +78,14 @@ class AuthActivity : DaggerAppCompatActivity() {
 
     lateinit var imageView: ImageView
 
+
+    @Inject
+    lateinit var authViewModel: AuthViewModel
+
+    lateinit var userId: EditText
+
+    lateinit var progressBar: ProgressBar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
@@ -84,12 +94,65 @@ class AuthActivity : DaggerAppCompatActivity() {
 
         Log.d(AuthActivity::class.simpleName, "onCreate is App Not Null value = $isAppNotNull")
         imageView = findViewById(R.id.login_logo)
+        userId = findViewById(R.id.user_id_input)
+        progressBar = findViewById(R.id.progress_bar)
+
+        findViewById<Button>(R.id.login_button).setOnClickListener(this)
         setLogo()
+
+        subscribeObservers()
     }
 
     private fun setLogo() {
         requestManager
             .load(logo)
             .into(imageView)
+    }
+
+    override fun onClick(v: View?) {
+       when(v?.id) {
+           R.id.login_button -> attemptLogin()
+       }
+    }
+
+    private fun attemptLogin() {
+        if(TextUtils.isEmpty(userId.text.toString())) return
+        authViewModel.authenticateWithId(Integer.parseInt(userId.text.toString()))
+    }
+
+    private fun subscribeObservers() {
+//        authViewModel.observeUser().observe(this, Observer {
+//            if(it != null) {
+//                Log.d(AuthActivity::class.simpleName, "onChanged " + it.email)
+//            }
+//        })
+
+        authViewModel.observeUser().observe(this, Observer {
+            when(it.authstatus) {
+                AuthResource.Authstatus.LOADING -> {
+                    showProgressBar(true)
+                }
+                AuthResource.Authstatus.AUTHENTICATED -> {
+                    showProgressBar(false)
+                    Log.d(AuthActivity::class.simpleName, "onChanged " + it.data?.email)
+                }
+                AuthResource.Authstatus.ERROR -> {
+                    showProgressBar(false)
+                    Log.d(AuthActivity::class.simpleName, "NOT__AUTHENTICATED ")
+                    Toast.makeText(this, "${it.message} Did you enter a number between 1 and 10", Toast.LENGTH_SHORT).show()
+                }
+                AuthResource.Authstatus.NOT__AUTHENTICATED -> {
+                    showProgressBar(false)
+                }
+            }
+        })
+    }
+
+    private fun showProgressBar(isVisible: Boolean) {
+        if(isVisible) {
+            progressBar.visibility = View.VISIBLE
+        } else {
+            progressBar.visibility = View.GONE
+        }
     }
 }
